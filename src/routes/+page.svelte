@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  import { bfInterpret }  from "$lib/call_wasm.jsx"
 
   let words = ["JavaScript", "SvelteKit"];
   let currentWord = "";

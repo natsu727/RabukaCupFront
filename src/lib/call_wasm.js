@@ -25,9 +25,10 @@ function removeWhitespace(str) {
 
 const path = "src/lib/bf_zig/zig-out/bin/bf_zig.wasm";
 
-var instance;
+//var instance;
 export async function bfInterpret(bf_input) {
 	bf_input = removeWhitespace(removeNewlines(bf_input));
+	console.log(`bf: ${bf_input}`);
 	try {
 		const response = await fetch(path);
 		const binaryData = await response.arrayBuffer();
@@ -36,15 +37,15 @@ export async function bfInterpret(bf_input) {
 		const module = await WebAssembly.compile(content);
 		const out_buf = [];
 
-		if (instance == undefined) {
-			instance = new WebAssembly.Instance(module, {
+	//	if (instance == undefined) {
+			const instance = new WebAssembly.Instance(module, {
 				env: {
 					print: (x) => console.log(x),
 					printChar: (x) => process.stdout.write(String.fromCharCode(x)),
 					printToOut: (x) => out_buf.push(x),
 				},
 			});
-		} 
+	//	} 
 
 		const lib = instance.exports;
 		const memory = lib.memory;

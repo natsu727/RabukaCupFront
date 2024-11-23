@@ -1,6 +1,6 @@
 <script lang="ts">
 import { onMount } from "svelte";
-import { bfInterpret }  from "$lib/call_wasm.jsx"
+import { bfInterpret }  from "$lib/call_wasm.js"
 
 
 var input = 
@@ -34,6 +34,7 @@ var input =
 // 	console.log(`input : ${input}`);
 // 	console.log(`output: ${out}`);
 // });
+let test = input.split('\n')
 
 let words = ["JavaScript", "SvelteKit"];
 let currentWord = "";
@@ -80,6 +81,10 @@ function nextWord() {
 
 function handleKeyPress(event: KeyboardEvent) {
 	if (!isGameActive) return;
+  
+  if(event.key ==="ArrowUp"){
+    userInput+=test.shift()
+  }
 
 	if (event.key === "Backspace") {
 		event.preventDefault();
@@ -89,9 +94,14 @@ function handleKeyPress(event: KeyboardEvent) {
 		return;
 	}
 
-	if (event.key === "Enter") {
-		nextWord();
-		return;
+	if (event.key === "Enter" ) {
+    userInput+="\n"
+    bfInterpret(userInput).then((out) => {
+      console.log(`input : ${userInput}`);
+      console.log(`output: ${out}`);
+    });
+	// 	nextWord();
+	// 	return;
 	}
 
 	if (
@@ -127,9 +137,9 @@ function getCharacterClass(index: number): string {
 }
 </script>
 
-<main class="container mx-auto p-4 max-w-2xl">
-<div class="text-center space-y-6">
-<h1 class="text-3xl font-bold mb-8">タイピングゲーム</h1>
+<main class="container mx-auto p-4 ">
+  <div class="text-center space-y-6">
+    <h1 class="text-3xl font-bold mb-8">タイピングゲーム</h1>
 
 {#if !isGameActive}
 <button
@@ -144,24 +154,26 @@ on:click={startGame}
 残り時間: <span class="font-bold">{timeLeft}</span>秒
 </div>
 
-<div class=" h-80 p-4 bg-gray-100 rounded-lg">
-<div class="text-2xl font-bold mb-4">
-{#each currentWord.split("") as char, i}
-<span class={getCharacterClass(i)}>{char}</span>
-{/each}
-</div>
-<div
-class="float-left w-1/2 p-3 border rounded-lg text-start text-xl min-h-[10.5rem] bg-white"
->
-{userInput}
-</div>
-<div
-class="float-left w-1/2 p-3 border rounded-lg text-center text-xl min-h-[10.5rem] bg-white"
->
-
-</div>
-</div>
-</div>
-{/if}
-</div>
+        <div class=" h-80 p-4 bg-gray-100 rounded-lg">
+          <div class="text-2xl font-bold mb-4">
+            {#each currentWord.split("") as char, i}
+              <span class={getCharacterClass(i)}>{char}</span>
+            {/each}
+          </div>
+          <div class="flex" >
+            <div
+            class=" mx-5 w-1/2 p-3 border rounded-lg text-start text-xl min-h-[10.5rem] bg-white break-words whitespace-pre-wrap"
+            >
+            {userInput}
+            </div>
+            <div
+            class=" mx-5 w-1/2 p-3 border rounded-lg text-center text-xl min-h-[10.5rem] bg-white break-words"
+            >
+            <!-- ここに相手のInputを表示 -->
+          </div>
+          </div>
+        </div>
+      </div>
+    {/if}
+  </div>
 </main>

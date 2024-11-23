@@ -1,7 +1,7 @@
 <script lang="ts">
 import { onMount } from "svelte";
 import { bfInterpret }  from "$lib/call_wasm.jsx"
-import { startP2p } from  "$lib/p2p.js"
+import { sendData, createRoom , joinRoom } from  "$lib/p2p.js"
 
 
 var input = 
@@ -124,7 +124,7 @@ function endGame() {
 
 function getCharacterClass(index: number): string {
 	if (!userInput[index]) return "text-gray-400";
-	if (userInput[index] === currentWord[index]) return "text-green-500"; // 正しい入力
+	if (userInput[index] === currentWord[index]) return "text-green-500";
 	return "text-red-500";
 }
 </script>
@@ -141,10 +141,6 @@ on:click={startGame}
 ゲームスタート
 </button>
 
-<button 
-class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600"
-on:click={startP2p}>start p2p</button>
-<div id="currentRoom"></div>
 
 {:else}
 <div class="space-y-4">
@@ -152,23 +148,29 @@ on:click={startP2p}>start p2p</button>
 残り時間: <span class="font-bold">{timeLeft}</span>秒
 </div>
 
-<div class=" h-80 p-4 bg-gray-100 rounded-lg">
-<div class="text-2xl font-bold mb-4">
-{#each currentWord.split("") as char, i}
-<span class={getCharacterClass(i)}>{char}</span>
-{/each}
-</div>
-<div
-class="float-left w-1/2 p-3 border rounded-lg text-start text-xl min-h-[10.5rem] bg-white"
->
-{userInput}
-</div>
 <div
 class="float-left w-1/2 p-3 border rounded-lg text-center text-xl min-h-[10.5rem] bg-white"
 >
+<div class=" h-80 p-4 bg-gray-100 rounded-lg">
+<textarea id="dataSend"></textarea>
+<textarea id="dataReceive" readonly ></textarea>
+<button 
+class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600"
+on:click={createRoom}>create room</button>
+</div>
+</div>
+</div>
+<span id="currentRoom"></span>
+<div>
+<input id="room-id">
+<button 
+class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600"
+on:click={joinRoom}>join</button>
+<button
+on:click={sendData}
+class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600"
+>send</button>
 
-</div>
-</div>
 </div>
 {/if}
 </div>

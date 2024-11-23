@@ -21,4 +21,4 @@ Thumbs.db
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
-/src/lib/server/*.json
+/src/lib/firebase/credential.js

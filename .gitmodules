@@ -1,0 +1,3 @@
+[submodule "src/bf_zig"]
+	path = src/bf_zig
+	url = git@github.com:50n1cd347h9/bf_zig.git

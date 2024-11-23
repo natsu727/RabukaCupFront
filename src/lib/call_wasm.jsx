@@ -1,11 +1,7 @@
 // const fs = import "fs";
 // const content = fs.readFileSync("../bf_zig/zig-out/bin/bf_zig.wasm");
 
-// import fs from 'node:fs';
-// const content = fs.readFileSync("./bf_zig/zig-out/bin/bf_zig.wasm");
 
-import { read } from '$app/server';
-const content = read("$lib/bf_zig/zig-out/bin/bf_zig.wasm");
 
 function removeNewlines(str) {
 	return str.replace(/[\r\n]/g, '');
@@ -14,10 +10,29 @@ function removeWhitespace(str) {
 	return str.replace(/\s+/g, '');
 }
 
+// var content = undefined;
+// export async function loadWasm() {
+// 	try {
+// 		const response = await fetch(path);
+// 		if (!response.ok) throw new Error('Failed to load the file');
+// 
+// 		binaryData = await response.arrayBuffer();
+// 		content =  Uint8Array(binaryData);
+// 	} catch (error) {
+// 		console.error('Error loading binary file:', error);
+// 	}
+// }
+
+const path = "src/lib/bf_zig/zig-out/bin/bf_zig.wasm";
+
 var instance;
-async function bfInterpret(bf_input) {
+export async function bfInterpret(bf_input) {
 	bf_input = removeWhitespace(removeNewlines(bf_input));
 	try {
+		const response = await fetch(path);
+		const binaryData = await response.arrayBuffer();
+		const content = new Uint8Array(binaryData);
+
 		const module = await WebAssembly.compile(content);
 		const out_buf = [];
 
@@ -75,7 +90,7 @@ var input =
 	>+
 	.`;
 
-bfInterpret(input).then((out) => {
-	console.log(`input : ${input}`);
-	console.log(`output: ${out}`);
-});
+// bfInterpret(input).then((out) => {
+// 	console.log(`input : ${input}`);
+// 	console.log(`output: ${out}`);
+// });

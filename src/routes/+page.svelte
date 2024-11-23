@@ -1,7 +1,7 @@
 <script lang="ts">
 
   import { onMount } from "svelte";
-  import { bfInterpret } from "$lib/call_wasm.js";
+  import { bfInterpret } from "$lib/call_wasm.ts";
 
   let output = "";
   var input = `+++++++++[>++++++++>+++++++++++>+++>+<<<<-]>

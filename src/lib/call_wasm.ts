@@ -3,10 +3,10 @@
 
 
 
-function removeNewlines(str) {
+function removeNewlines(str: string) {
 	return str.replace(/[\r\n]/g, '');
 }
-function removeWhitespace(str) {
+function removeWhitespace(str: string) {
 	return str.replace(/\s+/g, '');
 }
 
@@ -26,7 +26,7 @@ function removeWhitespace(str) {
 const path = "src/lib/bf_zig/zig-out/bin/bf_zig.wasm";
 
 //var instance;
-export async function bfInterpret(bf_input) {
+export async function bfInterpret(bf_input: string) {
 	bf_input = removeWhitespace(removeNewlines(bf_input));
 	console.log(`bf: ${bf_input}`);
 	try {
@@ -35,25 +35,25 @@ export async function bfInterpret(bf_input) {
 		const content = new Uint8Array(binaryData);
 
 		const module = await WebAssembly.compile(content);
-		const out_buf = [];
+		const out_buf: any[] = [];
 
 	//	if (instance == undefined) {
 			const instance = new WebAssembly.Instance(module, {
 				env: {
-					print: (x) => console.log(x),
-					printChar: (x) => process.stdout.write(String.fromCharCode(x)),
-					printToOut: (x) => out_buf.push(x),
+					print: (x: any) => console.log(x),
+					printChar: (x: number) => process.stdout.write(String.fromCharCode(x)),
+					printToOut: (x: any) => out_buf.push(x),
 				},
 			});
 	//	} 
 
 		const lib = instance.exports;
-		const memory = lib.memory;
+		const memory = lib.memory as WebAssembly.Memory;
 		const memoryView = new Uint8Array(memory.buffer);
 
 		const { written } = new TextEncoder().encodeInto(bf_input, memoryView);
 
-		lib.bfInterpret(0, written);
+		(lib.bfInterpret as Function)(0, written);
 
 		const ret = String.fromCharCode(...new Uint8Array(out_buf));
 

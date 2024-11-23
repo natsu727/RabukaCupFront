@@ -45,6 +45,17 @@
   let accuracy = 100;
   let totalTyped = 0;
 
+  async function updateOutput() {
+    try {
+      const out = await bfInterpret(userInput);
+      output = out ?? "";
+      console.log(`input : ${userInput}`);
+      console.log(`output: ${out}`);
+    } catch (error) {
+      console.error("Error interpreting input:", error);
+    }
+  }
+
   onMount(() => {
     window.addEventListener("keydown", handleKeyPress);
     return () => {
@@ -78,7 +89,7 @@
     userInput = "";
   }
 
-  function handleKeyPress(event: KeyboardEvent) {
+  async function handleKeyPress(event: KeyboardEvent) {
     if (!isGameActive) return;
 
     if (event.key === "ArrowUp") {
@@ -89,17 +100,14 @@
       event.preventDefault();
       if (userInput.length > 0) {
         userInput = userInput.slice(0, -1);
+        await updateOutput();
       }
       return;
     }
 
     if (event.key === "Enter") {
       userInput += "\n";
-      bfInterpret(userInput).then((out) => {
-        output = out ?? "";
-        console.log(`input : ${userInput}`);
-        console.log(`output: ${out}`);
-      });
+      await updateOutput();
       // 	nextWord();
       // 	return;
     }
@@ -115,6 +123,7 @@
 
     userInput += event.key;
     totalTyped++;
+    await updateOutput();
 
     if (userInput === currentWord) {
       score++;

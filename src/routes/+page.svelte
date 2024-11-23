@@ -32,7 +32,7 @@
       timeLeft--;
       if (timeLeft <= 0) {
         clearInterval(timer);
-        endGame();
+        // endGame();
       }
     }, 1000);
   }
@@ -109,16 +109,21 @@
           残り時間: <span class="font-bold">{timeLeft}</span>秒
         </div>
 
-        <div class="p-4 bg-gray-100 rounded-lg">
+        <div class=" h-80 p-4 bg-gray-100 rounded-lg">
           <div class="text-2xl font-bold mb-4">
             {#each currentWord.split("") as char, i}
               <span class={getCharacterClass(i)}>{char}</span>
             {/each}
           </div>
           <div
-            class="w-full p-2 border rounded-lg text-center text-xl min-h-[2.5rem] bg-white"
+            class="float-left w-1/2 p-3 border rounded-lg text-start text-xl min-h-[10.5rem] bg-white"
           >
             {userInput}
+          </div>
+          <div
+            class="float-left w-1/2 p-3 border rounded-lg text-center text-xl min-h-[10.5rem] bg-white"
+          >
+            
           </div>
         </div>
       </div>

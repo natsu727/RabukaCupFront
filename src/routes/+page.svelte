@@ -44,6 +44,7 @@
   let mistakes = 0;
   let accuracy = 100;
   let totalTyped = 0;
+  let cursorPosition = 0;
 
   async function updateOutput() {
     try {
@@ -93,28 +94,51 @@
   async function handleKeyPress(event: KeyboardEvent) {
     if (!isGameActive) return;
 
+    if (event.key === "ArrowLeft") {
+      cursorPosition = Math.max(0, cursorPosition - 1);
+      return;
+    }
+
+    if (event.key === "ArrowRight") {
+      cursorPosition = Math.min(userInput.length, cursorPosition + 1);
+      return;
+    }
+
     if (event.key === "ArrowUp") {
-      userInput += test.shift();
+      userInput =
+        userInput.slice(0, cursorPosition) +
+        (test.shift() ?? "") +
+        userInput.slice(cursorPosition);
+      cursorPosition += 1;
+      await updateOutput();
+      return;
     }
 
     if (event.key === "Backspace") {
       event.preventDefault();
-      if (userInput.length > 0) {
-        userInput = userInput.slice(0, -1);
+      if (cursorPosition > 0) {
+        userInput =
+          userInput.slice(0, cursorPosition - 1) +
+          userInput.slice(cursorPosition);
+        cursorPosition -= 1;
         await updateOutput();
       }
       return;
     }
 
     if (event.key === "Enter") {
-      userInput += "\n";
+      userInput =
+        userInput.slice(0, cursorPosition) +
+        "\n" +
+        userInput.slice(cursorPosition);
+      cursorPosition += 1;
       await updateOutput();
-      // 	nextWord();
-      // 	return;
+      return;
     }
 
     if (event.key === "Escape") {
       endGame();
+      return;
     }
 
     if (
@@ -126,7 +150,11 @@
       return;
     }
 
-    userInput += event.key;
+    userInput =
+      userInput.slice(0, cursorPosition) +
+      event.key +
+      userInput.slice(cursorPosition);
+    cursorPosition += 1;
     totalTyped++;
     await updateOutput();
 
@@ -227,7 +255,9 @@
               <div
                 class="mx-5 mt-2 p-3 border rounded-lg text-start text-xl min-h-[10.5rem] bg-white break-words whitespace-pre-wrap"
               >
-                {userInput}
+                {userInput.slice(0, cursorPosition)}<span class="animate-pulse"
+                  >|</span
+                >{userInput.slice(cursorPosition)}
               </div>
             </div>
             <div

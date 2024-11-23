@@ -1,5 +1,4 @@
 <script lang="ts">
-
   import { onMount } from "svelte";
   import { bfInterpret } from "$lib/call_wasm.ts";
 
@@ -66,7 +65,7 @@
 
   function startGame() {
     isGameActive = true;
-    active=true;
+    active = true;
     score = 0;
     timeLeft = 60;
     mistakes = 0;
@@ -114,7 +113,7 @@
       // 	return;
     }
 
-    if(event.key ==="Escape"){
+    if (event.key === "Escape") {
       endGame();
     }
 
@@ -143,8 +142,8 @@
 
   function endGame() {
     isGameActive = false;
-    active=false;
-    blurRevel=5;
+    active = false;
+    blurRevel = 5;
     alert(`ゲーム終了!\nスコア: ${score}\n正確性: ${accuracy}%`);
   }
 
@@ -154,68 +153,70 @@
     return "text-red-500";
   }
 
-export let videoElem: HTMLVideoElement | undefined;
-export let active: boolean = false;
-$: if (active) {
-		startCapture();
-}
+  export let videoElem: HTMLVideoElement | undefined;
+  export let active: boolean = false;
+  $: if (active) {
+    startCapture();
+  }
 
-
-function startCapture() {
-		// Web カメラのストリームを取得して video 要素に紐付ける
-		navigator.mediaDevices
-			.getUserMedia({ video: true })
-			.then((mediaStream: MediaStream) => {
-				if (videoElem) {
-					videoElem.srcObject = mediaStream;
-					videoElem.play();
-				}
-			})
-			.catch((err) => {
-				console.error('Web カメラの取得に失敗しました:', err);
-			});
-	}
+  function startCapture() {
+    // Web カメラのストリームを取得して video 要素に紐付ける
+    navigator.mediaDevices
+      .getUserMedia({ video: true })
+      .then((mediaStream: MediaStream) => {
+        if (videoElem) {
+          videoElem.srcObject = mediaStream;
+          videoElem.play();
+        }
+      })
+      .catch((err) => {
+        console.error("Web カメラの取得に失敗しました:", err);
+      });
+  }
 
   let blurRevel = 5;
 
-  const revel=[
+  const revel = [
     "blur-none",
     "blur-sm",
     "blur-md",
     "blur-lg",
     "blur-xl",
-    "blur-2xl"
-]
-
+    "blur-2xl",
+  ];
 </script>
 
 <main class="container mx-auto p-4">
   <div class="text-center space-y-6">
     <h1 class="text-3xl font-bold mb-8">タイピングゲーム</h1>
 
+    {#if !isGameActive}
+      <button
+        class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600"
+        on:click={startGame}
+      >
+        ゲームスタート
+      </button>
+    {:else}
+      <div class="space-y-4">
+        <div class="flex justify-center flex-row">
+          <div class="border w-60 max-h-fit">
+            <video
+              id="webcam"
+              bind:this={videoElem}
+              class={revel[blurRevel]}
+              playsinline
+            >
+            </video>
+          </div>
 
-{#if !isGameActive}
-<button
-class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600"
-on:click={startGame}
->
-ゲームスタート
-</button>
-{:else}
-<div class="space-y-4">
-  <div class="flex justify-center flex-row">
-    <div class="border w-60 max-h-fit">
-      <video id="webcam" bind:this={videoElem} class={revel[blurRevel]}  playsinline>
-      </video>
-    </div>
-
-    <div class="text-xl p-20">
-      残り時間: <span class="font-bold">{timeLeft}</span>秒
-    </div>
-    <div class="border w-60 max-h-fit">
-      <div class=""></div>
-    </div>
-  </div>
+          <div class="text-xl p-20">
+            残り時間: <span class="font-bold">{timeLeft}</span>秒
+          </div>
+          <div class="border w-60 max-h-fit">
+            <div class=""></div>
+          </div>
+        </div>
 
         <div class=" h-80 p-4 bg-gray-100 rounded-lg">
           <div class="text-2xl font-bold mb-4">

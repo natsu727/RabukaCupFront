@@ -1,34 +1,35 @@
 <script lang="ts">
 import { onMount } from "svelte";
 import { bfInterpret }  from "$lib/call_wasm.jsx"
+import { startP2p } from  "$lib/p2p.js"
 
 
 var input = 
 `+++++++++[>++++++++>+++++++++++>+++>+<<<<-]>
-	.
-	>++
-	.
-	+++++++
-	.
-	.
-	+++
-	.
-	>+++++
-	.
-	<<+++++++++++++++
-	.
-	>
-	.
-	+++
-	.
-	------
-	.
-	--------
-	.
-	>+
-	.
-	>+
-	.`;
+.
+>++
+.
++++++++
+.
+.
++++
+.
+>+++++
+.
+<<+++++++++++++++
+.
+>
+.
++++
+.
+------
+.
+--------
+.
+>+
+.
+>+
+.`;
 
 // bfInterpret(input).then((out) => {
 // 	console.log(`input : ${input}`);
@@ -71,6 +72,7 @@ function startGame() {
 			}
 			}, 1000);
 }
+
 
 function nextWord() {
 	const index = Math.floor(Math.random() * words.length);
@@ -138,6 +140,12 @@ on:click={startGame}
 >
 ゲームスタート
 </button>
+
+<button 
+class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600"
+on:click={startP2p}>start p2p</button>
+<div id="currentRoom"></div>
+
 {:else}
 <div class="space-y-4">
 <div class="text-xl">

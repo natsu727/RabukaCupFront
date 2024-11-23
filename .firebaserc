@@ -1,0 +1,8 @@
+{
+  "projects": {
+    "default": "webrtc-7a9af",
+    "rabuka-firestore": "webrtc-7a9af"
+  },
+  "targets": {},
+  "etags": {}
+}

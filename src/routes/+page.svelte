@@ -211,6 +211,7 @@
 <main class="container mx-auto p-4">
   <div class="text-center space-y-6">
     <h1 class="text-3xl font-bold mb-8">タイピングゲーム</h1>
+    <h4 class=" text-gray-500">対戦モード</h4>
 
     {#if !isGameActive}
       <button
@@ -218,7 +219,8 @@
         on:click={startGame}
       >
         ゲームスタート
-      </button>
+      </button><br/>
+      <a href="/solo_mode" >ソロモード</a>
     {:else}
       <div class="space-y-4">
         <div class="flex justify-center flex-row">

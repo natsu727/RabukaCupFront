@@ -35,7 +35,7 @@
   // });
   let test = input.split("\n");
 
-  let words = ["JavaScript", "SvelteKit"];
+  let words = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
   let currentWord = "";
   let userInput = "";
   let score = 0;
@@ -147,12 +147,6 @@
     alert(`ゲーム終了!\nスコア: ${score}\n正確性: ${accuracy}%`);
   }
 
-  function getCharacterClass(index: number): string {
-    if (!userInput[index]) return "text-gray-400";
-    if (userInput[index] === currentWord[index]) return "text-green-500";
-    return "text-red-500";
-  }
-
   export let videoElem: HTMLVideoElement | undefined;
   export let active: boolean = false;
   $: if (active) {
@@ -207,6 +201,7 @@
               class={revel[blurRevel]}
               playsinline
             >
+              <track kind="captions" />
             </video>
           </div>
 
@@ -220,9 +215,7 @@
 
         <div class=" h-80 p-4 bg-gray-100 rounded-lg">
           <div class="text-2xl font-bold mb-4">
-            {#each currentWord.split("") as char, i}
-              <span class={getCharacterClass(i)}>{char}</span>
-            {/each}
+            {currentWord}
           </div>
           <div class="flex">
             <div class="flex flex-col w-1/2">

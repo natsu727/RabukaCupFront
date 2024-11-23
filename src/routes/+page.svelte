@@ -2,31 +2,32 @@
   import { onMount } from "svelte";
   import { bfInterpret } from "$lib/call_wasm.js";
 
+  let output = "";
   var input = `+++++++++[>++++++++>+++++++++++>+++>+<<<<-]>
-	.
-	>++
-	.
-	+++++++
-	.
-	.
-	+++
-	.
-	>+++++
-	.
-	<<+++++++++++++++
-	.
-	>
-	.
-	+++
-	.
-	------
-	.
-	--------
-	.
-	>+
-	.
-	>+
-	.`;
+		.
+		>++
+		.
+		+++++++
+		.
+		.
+		+++
+		.
+		>+++++
+		.
+		<<+++++++++++++++
+		.
+		>
+		.
+		+++
+		.
+		------
+		.
+		--------
+		.
+		>+
+		.
+		>+
+		.`;
 
   // bfInterpret(input).then((out) => {
   // 	console.log(`input : ${input}`);
@@ -59,6 +60,7 @@
     totalTyped = 0;
     accuracy = 100;
     userInput = "";
+    output = "";
     nextWord();
 
     const timer = setInterval(() => {
@@ -94,6 +96,7 @@
     if (event.key === "Enter") {
       userInput += "\n";
       bfInterpret(userInput).then((out) => {
+        output = out ?? "";
         console.log(`input : ${userInput}`);
         console.log(`output: ${out}`);
       });
@@ -129,7 +132,7 @@
 
   function getCharacterClass(index: number): string {
     if (!userInput[index]) return "text-gray-400";
-    if (userInput[index] === currentWord[index]) return "text-green-500"; // 正しい入力
+    if (userInput[index] === currentWord[index]) return "text-green-500";
     return "text-red-500";
   }
 </script>
@@ -158,13 +161,20 @@
             {/each}
           </div>
           <div class="flex">
-            <div
-              class=" mx-5 w-1/2 p-3 border rounded-lg text-start text-xl min-h-[10.5rem] bg-white break-words whitespace-pre-wrap"
-            >
-              {userInput}
+            <div class="flex flex-col w-1/2">
+              <div
+                class="mx-5 p-3 border rounded-lg text-center text-xl bg-white break-words whitespace-pre-wrap"
+              >
+                {output}
+              </div>
+              <div
+                class="mx-5 mt-2 p-3 border rounded-lg text-start text-xl min-h-[10.5rem] bg-white break-words whitespace-pre-wrap"
+              >
+                {userInput}
+              </div>
             </div>
             <div
-              class=" mx-5 w-1/2 p-3 border rounded-lg text-center text-xl min-h-[10.5rem] bg-white break-words"
+              class="mx-5 w-1/2 p-3 border rounded-lg text-center text-xl min-h-[10.5rem] bg-white break-words"
             >
               <!-- ここに相手のInputを表示 -->
             </div>

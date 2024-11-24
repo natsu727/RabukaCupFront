@@ -62,9 +62,3 @@
 		</button>
 	</div>
 </main>
-
-<style>
-	.a {
-		color: blue;
-	}
-</style>

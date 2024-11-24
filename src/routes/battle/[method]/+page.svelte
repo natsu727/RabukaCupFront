@@ -32,11 +32,10 @@
 	});
 </script>
 
-<h1>slug: {data.method}</h1>
-<h1 id="currentRoom"></h1>
-
 <!-- battle view here -->
 <main class="container mx-auto p-4 max-w-2xl">
+	<h1>slug: {data.method}</h1>
+	<h1 id="currentRoom"></h1>
 	<div class="space-y-4">
 		<div class="text-xl">
 			残り時間: <span class="font-bold">{$gameState.timeLeft}</span>秒

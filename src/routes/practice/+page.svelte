@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from "svelte";
+	import { createRoom, joinRoom } from "$lib/p2p.js";
 	import { gameLogic } from "$lib/game.ts";
 
 	const gameState = gameLogic.getStore();
@@ -23,56 +24,28 @@
 			<span>このサイトはあなたを楽しませ、あなたの脳を破壊するために存在します。</span>
 			<span>とめどなく流れる寿司を食いまくってもよし、あなたのライバルとオンラインで戦ってもよし。</span><br>
 			<span>brainfckの腕に自身が無い？<span><br>
-			<span>なら、先ずは <a class='text-blue-600' href="/practice">練習場</a> に行ってみると良いでしょう。</span><br>
-			<span>brainfckを知らない？何をしに此処へ来たんですか？</span> 
-			(<a class='text-blue-600' href="https://ja.wikipedia.org/wiki/Brainfuck">wikipedia</a> を見る)
+			<span>なら、先ずは <a href="/practice">練習場</a> に行ってみると良いでしょう。</span><br>
+			<span>brainfckを知らない？何をしに此処へ来たんですか？</span>
 		</div>
 		<h1 class="text-3xl font-bold mb-8">タイピングゲーム</h1>
 
 		{#if !$gameState.isGameActive}
-		<div class='selectfield'>
-			<div>
-				<button
-					on:click={() => window.location.href="/practice"}
-					class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600"
-				>練習場</button>
-			</div>
+			<button
+				class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600"
+			>ルーム作成</button>
 
-			<div>
-				<button
-					on:click={() => window.location.href="/solo_mode"}
-					class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600"
-				>寿司</button>
-			</div>
+			<span>コードを入力して</span>
+			<input type="text" style:outline="solid" minlength="16"/><br>
+			<button
+				class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600"
+			>joinする</button>
 
-			<div>
-				<button
-					on:click={() => window.location.href="/battle/create"}
-					class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600"
-				>ルーム作成</button>
-			</div>
-
-			<div class='join'>
-				<span>コードを入力して</span>
-
-				<input type="text" id='room-id' style:outline="solid" minlength="16"/><br>
-
-				<button
-					on:click={() => {
-						const roomId = document.querySelector('#room-id').value;
-						window.location.href=`/battle/join/${roomId}`
-					}}
-					class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600"
-				>joinする</button>
-			</div>
-
-			<!-- <button
+			<button
 				class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600"
 				on:click={() => gameLogic.startGame()}
 			>
 				ゲームスタート
-			</button> -->
-		</div>
+			</button>
 		{:else}
 			<div class="space-y-4">
 				<div class="text-xl">
@@ -108,16 +81,7 @@
 </main>
 
 <style>
-.selectfield {
-	display: flex;
-}
-
-.selectfield div {
-	margin: 0 8px;	
-}
-
-.join {
-	display: flex;
-	flex-direction: column;
+.a {
+	color: blue;
 }
 </style>

@@ -12,11 +12,13 @@ interface GameState {
     mistakes: number;
     accuracy: number;
     totalTyped: number;
+    bfCode: string;
 }
 
 class TypingGameLogic {
     private state: Writable<GameState>;
     private timer: number | null = null;
+    private readonly allowedChars = ['+', '-', '[', ']', '.', '>', '<'];
 
     constructor() {
         this.state = writable({
@@ -29,7 +31,9 @@ class TypingGameLogic {
             isGameActive: false,
             mistakes: 0,
             accuracy: 100,
-            totalTyped: 0
+            totalTyped: 0,
+            bfCode: `+++++++++[>++++++++>+++++++++++>+++>+<<<<-]>
+.>++.+++++++..+++.>+++++.<<+++++++++++++++.>.+++.------.--------.>+.>+.`
         });
     }
 
@@ -37,32 +41,16 @@ class TypingGameLogic {
         return this.state;
     }
 
-    async updateOutput(userInput: string) {
-        try {
-            const out = await bfInterpret(userInput);
-            this.state.update(state => ({
-                ...state,
-                output: out ?? "",
-                userInput
-            }));
-            console.log(`input : ${userInput}`);
-            console.log(`output: ${out}`);
-        } catch (error) {
-            console.error("Error interpreting input:", error);
-        }
-    }
-
     startGame() {
         this.state.update(state => ({
             ...state,
             isGameActive: true,
             score: 0,
-            timeLeft: 90,
+            timeLeft: 60,
             mistakes: 0,
             totalTyped: 0,
             accuracy: 100,
-            userInput: "",
-            output: ""
+            userInput: ""
         }));
 
         this.nextWord();
@@ -72,9 +60,6 @@ class TypingGameLogic {
                 const newTimeLeft = state.timeLeft - 1;
                 if (newTimeLeft <= 0) {
                     this.endGame();
-                }
-                if (newTimeLeft % 15 === 0) {
-                    this.nextWord();
                 }
                 return { ...state, timeLeft: newTimeLeft };
             });
@@ -92,6 +77,10 @@ class TypingGameLogic {
         });
     }
 
+    isAllowedChar(char: string): boolean {
+        return this.allowedChars.includes(char);
+    }
+
     async handleKeyPress(event: KeyboardEvent) {
         let currentState: GameState = {
             output: "",
@@ -103,7 +92,8 @@ class TypingGameLogic {
             isGameActive: false,
             mistakes: 0,
             accuracy: 0,
-            totalTyped: 0
+            totalTyped: 0,
+            bfCode: ""
         };
         this.state.subscribe(state => {
             currentState = state;
@@ -111,23 +101,8 @@ class TypingGameLogic {
 
         if (!currentState.isGameActive) return;
 
-        if (event.key === "Backspace") {
-            event.preventDefault();
-            if (currentState.userInput.length > 0) {
-                const newInput = currentState.userInput.slice(0, -1);
-                await this.updateOutput(newInput);
-            }
-            return;
-        }
-
         if (event.key === "Enter") {
-            const newInput = currentState.userInput + "\n";
-            await this.updateOutput(newInput);
-            return;
-        }
-
-        if (event.key === "Escape") {
-            this.endGame();
+            this.nextWord();
             return;
         }
 
@@ -140,31 +115,42 @@ class TypingGameLogic {
             return;
         }
 
+        // Check if key is allowed for Brainfuck
+        if (!this.isAllowedChar(event.key)) {
+            event.preventDefault();
+            return;
+        }
+
         const newInput = currentState.userInput + event.key;
         this.state.update(state => ({
             ...state,
+            userInput: newInput,
             totalTyped: state.totalTyped + 1
         }));
 
-        await this.updateOutput(newInput);
+        if (newInput === currentState.currentWord) {
+            this.state.update(state => ({
+                ...state,
+                score: state.score + 1
+            }));
+            setTimeout(() => this.nextWord(), 100);
+        } else if (newInput.length >= currentState.currentWord.length) {
+            this.state.update(state => ({
+                ...state,
+                mistakes: state.mistakes + 1,
+                accuracy: Math.round(((state.totalTyped - state.mistakes) / state.totalTyped) * 100)
+            }));
+        }
+    }
 
-        this.state.subscribe(state => {
-            if (state.output === state.currentWord) {
-                this.state.update(s => ({
-                    ...s,
-                    score: s.score + 1,
-                    timeLeft: s.timeLeft + 10,
-                    output: ""
-                }));
-                setTimeout(() => this.nextWord(), 100);
-            } else if (state.userInput.length >= state.currentWord.length) {
-                this.state.update(s => ({
-                    ...s,
-                    mistakes: s.mistakes + 1,
-                    accuracy: Math.round(((s.totalTyped - s.mistakes) / s.totalTyped) * 100)
-                }));
-            }
-        })();
+    async interpretBf(code: string) {
+        try {
+            const result = await bfInterpret(code);
+            return result;
+        } catch (error) {
+            console.error("Error interpreting Brainfuck code:", error);
+            return null;
+        }
     }
 
     endGame() {

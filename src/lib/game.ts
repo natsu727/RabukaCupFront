@@ -1,10 +1,10 @@
 import { writable, type Writable } from 'svelte/store';
 import { bfInterpret } from "./call_wasm.ts";
+import { problems } from './problems.ts';
 
 interface GameState {
     output: string;
-    words: string[];
-    currentWord: string;
+    currentProblem: typeof problems[0];
     userInput: string;
     score: number;
     timeLeft: number;
@@ -12,10 +12,9 @@ interface GameState {
     mistakes: number;
     accuracy: number;
     totalTyped: number;
-    bfCode: string;
 }
 
-class TypingGameLogic {
+export class TypingGameLogic {
     private state: Writable<GameState>;
     private timer: number | null = null;
     private readonly allowedChars = ['+', '-', '[', ']', '.', '>', '<'];
@@ -23,17 +22,14 @@ class TypingGameLogic {
     constructor() {
         this.state = writable({
             output: "",
-            words: ["A", "B", "c", "d"],
-            currentWord: "",
+            currentProblem: problems[0],
             userInput: "",
             score: 0,
             timeLeft: 60,
             isGameActive: false,
             mistakes: 0,
             accuracy: 100,
-            totalTyped: 0,
-            bfCode: `+++++++++[>++++++++>+++++++++++>+++>+<<<<-]>
-.>++.+++++++..+++.>+++++.<<+++++++++++++++.>.+++.------.--------.>+.>+.`
+            totalTyped: 0
         });
     }
 
@@ -53,7 +49,14 @@ class TypingGameLogic {
             userInput: ""
         }));
 
-        this.nextWord();
+        this.nextProblem();
+        this.startTimer();
+    }
+
+    private startTimer() {
+        if (this.timer) {
+            clearInterval(this.timer);
+        }
 
         this.timer = window.setInterval(() => {
             this.state.update(state => {
@@ -66,43 +69,28 @@ class TypingGameLogic {
         }, 1000);
     }
 
-    nextWord() {
+    nextProblem() {
         this.state.update(state => {
-            const index = Math.floor(Math.random() * state.words.length);
+            const index = Math.floor(Math.random() * problems.length);
             return {
                 ...state,
-                currentWord: state.words[index],
+                currentProblem: problems[index],
                 userInput: ""
             };
         });
     }
 
-    isAllowedChar(char: string): boolean {
-        return this.allowedChars.includes(char);
-    }
-
     async handleKeyPress(event: KeyboardEvent) {
-        let currentState: GameState = {
-            output: "",
-            words: [],
-            currentWord: "",
-            userInput: "",
-            score: 0,
-            timeLeft: 0,
-            isGameActive: false,
-            mistakes: 0,
-            accuracy: 0,
-            totalTyped: 0,
-            bfCode: ""
-        };
+        let currentState: GameState | undefined;
         this.state.subscribe(state => {
             currentState = state;
         })();
 
-        if (!currentState.isGameActive) return;
+        if (!currentState?.isGameActive) return;
 
         if (event.key === "Enter") {
-            this.nextWord();
+            event.preventDefault();
+            await this.checkAnswer();
             return;
         }
 
@@ -115,42 +103,52 @@ class TypingGameLogic {
             return;
         }
 
-        // Check if key is allowed for Brainfuck
         if (!this.isAllowedChar(event.key)) {
             event.preventDefault();
             return;
         }
 
-        const newInput = currentState.userInput + event.key;
         this.state.update(state => ({
             ...state,
-            userInput: newInput,
+            userInput: state.userInput + event.key,
             totalTyped: state.totalTyped + 1
         }));
+    }
 
-        if (newInput === currentState.currentWord) {
-            this.state.update(state => ({
-                ...state,
-                score: state.score + 1
-            }));
-            setTimeout(() => this.nextWord(), 100);
-        } else if (newInput.length >= currentState.currentWord.length) {
-            this.state.update(state => ({
-                ...state,
-                mistakes: state.mistakes + 1,
-                accuracy: Math.round(((state.totalTyped - state.mistakes) / state.totalTyped) * 100)
-            }));
+    private async checkAnswer() {
+        let currentState: GameState | undefined;
+        this.state.subscribe(state => {
+            currentState = state;
+        })();
+
+        if (!currentState) return;
+
+        try {
+            const userOutput = await bfInterpret(currentState.userInput);
+            const expectedOutput = await bfInterpret(currentState.currentProblem.code);
+
+            if (userOutput === expectedOutput) {
+                this.state.update(state => ({
+                    ...state,
+                    score: state.score + 1
+                }));
+                setTimeout(() => this.nextProblem(), 100);
+            } else {
+                this.state.update(state => ({
+                    ...state,
+                    mistakes: state.mistakes + 1,
+                    accuracy: Math.round(
+                        ((state.totalTyped - state.mistakes) / state.totalTyped) * 100
+                    )
+                }));
+            }
+        } catch (error) {
+            console.error("Error interpreting Brainfuck code:", error);
         }
     }
 
-    async interpretBf(code: string) {
-        try {
-            const result = await bfInterpret(code);
-            return result;
-        } catch (error) {
-            console.error("Error interpreting Brainfuck code:", error);
-            return null;
-        }
+    private isAllowedChar(char: string): boolean {
+        return this.allowedChars.includes(char);
     }
 
     endGame() {
@@ -169,7 +167,7 @@ class TypingGameLogic {
         let className = "text-gray-400";
         this.state.subscribe(state => {
             if (!state.userInput[index]) return;
-            if (state.userInput[index] === state.currentWord[index]) {
+            if (state.userInput[index] === state.currentProblem.code[index]) {
                 className = "text-green-500";
             } else {
                 className = "text-red-500";

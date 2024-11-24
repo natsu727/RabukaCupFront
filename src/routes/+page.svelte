@@ -6,11 +6,14 @@
 	const gameState = gameLogic.getStore();
 
 	onMount(() => {
-		window.addEventListener("keydown", (e) => gameLogic.handleKeyPress(e));
+		const handleKeyDown = (e: KeyboardEvent) => {
+			if (!(e.target instanceof HTMLTextAreaElement)) {
+				gameLogic.handleKeyPress(e);
+			}
+		};
+		window.addEventListener("keydown", handleKeyDown);
 		return () => {
-			window.removeEventListener("keydown", (e) =>
-				gameLogic.handleKeyPress(e),
-			);
+			window.removeEventListener("keydown", handleKeyDown);
 		};
 	});
 	function handleKeyDown(event: KeyboardEvent) {
@@ -50,7 +53,11 @@
 							<textarea
 								id="dataSend"
 								placeholder="your code here"
-								value={$gameState.userInput}
+								bind:value={$gameState.userInput}
+								on:input={(e) =>
+									gameLogic.handleInput(
+										e.currentTarget.value,
+									)}
 								on:keydown={handleKeyDown}
 								class="flex-1 h-32 p-2 font-mono rounded-lg"
 							></textarea>

@@ -80,6 +80,32 @@ export class TypingGameLogic {
         });
     }
 
+    handleInput(newValue: string) {
+        let currentState: GameState | undefined;
+        this.state.subscribe(state => {
+            currentState = state;
+        })();
+
+        if (!currentState?.isGameActive) return;
+
+        if (newValue.length < currentState.userInput.length) {
+            this.state.update(state => ({
+                ...state,
+                userInput: newValue
+            }));
+            return;
+        }
+
+        const lastChar = newValue[newValue.length - 1];
+        if (this.isAllowedChar(lastChar)) {
+            this.state.update(state => ({
+                ...state,
+                userInput: newValue,
+                totalTyped: state.totalTyped + 1
+            }));
+        }
+    }
+
     async handleKeyPress(event: KeyboardEvent) {
         let currentState: GameState | undefined;
         this.state.subscribe(state => {
@@ -91,6 +117,10 @@ export class TypingGameLogic {
         if (event.key === "Enter") {
             event.preventDefault();
             await this.checkAnswer();
+            return;
+        }
+
+        if (event.target instanceof HTMLTextAreaElement) {
             return;
         }
 

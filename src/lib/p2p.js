@@ -39,13 +39,13 @@ export async function sendData() {
 	console.log('Sent Data: ' + data);
 }
 
-export async function joinRoom() {
-	roomId = document.querySelector('#room-id').value;
-	document.querySelector(
-		'#currentRoom').innerText = `Current room is ${roomId} - You are the callee!`;
-	await joinRoomById(roomId);
-	addInputLister();
-}
+// export async function joinRoom() {
+// 	roomId = document.querySelector('#room-id').value;
+// 	document.querySelector(
+// 		'#currentRoom').innerText = `Current room is ${roomId} - You are the callee!`;
+// 	await joinRoomById(roomId);
+// 	addInputLister();
+// }
 
 async function addInputLister() {
 	dataSend.addEventListener('keyup', () => {
@@ -136,7 +136,7 @@ function gotDescription2(desc) {
 }
 
 
-async function joinRoomById(roomId) {
+export async function joinRoomById(roomId) {
 	const roomRef = await doc(db, "rooms", roomId);
 	const roomSnapshot = await getDoc(roomRef);
 	console.log('Got room:', roomRef);
@@ -182,6 +182,7 @@ async function joinRoomById(roomId) {
 				}
 			});
 		});
+ 	addInputLister();
 	}
 }
 

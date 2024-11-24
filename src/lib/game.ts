@@ -33,7 +33,6 @@ export class TypingGameLogic {
         });
     }
 
-    // getStoreメソッドを追加
     getStore() {
         return this.state;
     }
@@ -90,6 +89,7 @@ export class TypingGameLogic {
         if (!currentState?.isGameActive) return;
 
         if (event.key === "Enter") {
+            event.preventDefault();
             await this.checkAnswer();
             return;
         }

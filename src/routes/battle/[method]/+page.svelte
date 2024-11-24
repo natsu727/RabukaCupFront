@@ -14,3 +14,5 @@
 <h1>slug: {data.method}</h1>
 <h1 id="currentRoom"></h1>
 
+<!-- battle view here -->
+

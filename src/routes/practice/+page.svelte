@@ -42,56 +42,24 @@
 		</div>
 		<h1 class="text-3xl font-bold mb-8">タイピングゲーム</h1>
 
-		{#if !$gameState.isGameActive}
-			<button
-				class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600"
-				>ルーム作成</button
-			>
+		<button
+			class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600"
+			>ルーム作成</button
+		>
 
-			<span>コードを入力して</span>
-			<input type="text" style:outline="solid" minlength="16" /><br />
-			<button
-				class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600"
-				>joinする</button
-			>
+		<span>コードを入力して</span>
+		<input type="text" style:outline="solid" minlength="16" /><br />
+		<button
+			class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600"
+			>joinする</button
+		>
 
-			<button
-				class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600"
-				on:click={() => gameLogic.startGame()}
-			>
-				ゲームスタート
-			</button>
-		{:else}
-			<div class="space-y-4">
-				<div class="text-xl">
-					残り時間: <span class="font-bold"
-						>{$gameState.timeLeft}</span
-					>秒
-				</div>
-
-				<div
-					class="float-left w-1/2 p-3 border rounded-lg text-center text-xl min-h-[10.5rem] bg-white"
-				>
-					<div class=" h-80 p-4 bg-gray-100 rounded-lg">
-						<textarea id="dataSend" placeholder="your code here"
-						></textarea>
-						<textarea id="dataReceive" readonly></textarea>
-						<button
-							class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600"
-							on:click={createRoom}>create room</button
-						>
-					</div>
-				</div>
-			</div>
-			<span id="currentRoom"></span>
-			<div>
-				<input id="room-id" />
-				<button
-					class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600"
-					on:click={joinRoom}>join</button
-				>
-			</div>
-		{/if}
+		<button
+			class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600"
+			on:click={() => gameLogic.startGame()}
+		>
+			ゲームスタート
+		</button>
 	</div>
 </main>
 

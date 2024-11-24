@@ -34,8 +34,7 @@ let receiveChannel;
 
 
 export async function sendData() {
-	// const data = await document.querySelector('#dataSend').value;
-	const data = "hogehgoe message";
+	const data = dataSend.value;
 	sendChannel.send(data);
 	console.log('Sent Data: ' + data);
 }
@@ -45,6 +44,13 @@ export async function joinRoom() {
 	document.querySelector(
 		'#currentRoom').innerText = `Current room is ${roomId} - You are the callee!`;
 	await joinRoomById(roomId);
+	addInputLister();
+}
+
+async function addInputLister() {
+	dataSend.addEventListener('keyup', () => {
+		 sendData();
+	});
 }
 
 export async function createRoom() {
@@ -100,6 +106,8 @@ export async function createRoom() {
 			}
 		});
 	});
+
+	addInputLister();
 }
 
 function setSendChannel() {
@@ -114,7 +122,8 @@ function setSendChannel() {
 		onIceCandidate(peerConnection, e);
 	};
 
-	// peerConnection.ondatachannel = receiveChannelCallback;
+  	peerConnection.ondatachannel = receiveChannelCallback;
+
 
 	console.log('Created local peer connection object peerConnection');
 }
@@ -130,13 +139,12 @@ function gotDescription2(desc) {
 async function joinRoomById(roomId) {
 	const roomRef = await doc(db, "rooms", roomId);
 	const roomSnapshot = await getDoc(roomRef);
-  	// const roomSnapshot = await roomRef.get();
 	console.log('Got room:', roomRef);
-
-	console.log(roomSnapshot);
+	
 
 	if (roomSnapshot.exists()) {
 		peerConnection = new RTCPeerConnection(configuration);
+		setSendChannel();
 
 		registerPeerConnectionListeners();
 
@@ -227,7 +235,7 @@ function onAddIceCandidateError(error) {
 
 
 function onReceiveMessageCallback(event) {
-	console.log('Received Message');
+	console.log('Received Message', event.data);
 	dataReceive.value = event.data;
 }
 
